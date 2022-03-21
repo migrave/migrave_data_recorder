@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="user" default="michal" />
+    <arg name="participant" default="3" />
+    <arg name="directories_list" default="video,audio,rosbag"/>
+
+    <arg name="is_record_topic" default="/qt_robot_recording/is_record" />
+    <arg name="if_record_audio" default="true" />
+    <arg name="if_record_mobile_stream" default="false" />
+    <arg name="if_rosbag" default="true" />
+
+    <node pkg="migrave_data_recorder" type="migrave_dir_creator.py" name="migrave_dir_creator" output="screen">
+        <param name="output_directory" type="str" value="/home/$(arg user)/experiments/$(arg participant)/" />
+        <param name="directories_list" value="$(arg directories_list)"/>
+    </node>
+    
+    <node pkg="migrave_video_recorder" type="migrave_video_recorder.py" name="migrave_video_recorder" output="screen">
+        <param name="output_directory" type="str" value="/home/$(arg user)/experiments/$(arg participant)/video/" />
+        <param name="color_image_topic" type="str" value="/camera/color/image_raw" />
+        <param name="depth_image_topic" type="str" value="/camera/depth/image_raw" />
+        <param name="is_record_topic" type="str" value="$(arg is_record_topic)" />
+        <param name="video_type" type="str" value="mp4" />
+        <param name="video_dimensions" type="str" value="480p" />
+        <param name="frames_per_second" type="int" value="30" />
+    </node>
+
+    <group if="$(arg if_record_audio)">
+    <node pkg="migrave_audio_recorder" type="migrave_audio_recorder.py" name="migrave_audio_recorder" output="screen">
+        <param name="output_directory" type="str" value="/home/$(arg user)/experiments/$(arg participant)/audio" />
+        <param name="channel_topic" type="str" value="/qt_respeaker_app/channel0" />
+        <param name="is_record_topic" type="str" value="$(arg is_record_topic)" />
+        <param name="audio_rate" type="int" value="16000" />
+        <param name="audio_channel" type="int" value="1" />
+        <param name="audio_width" type="int" value="2" />
+        <param name="audio_type" type="str" value="wav" />
+    </node>
+    </group>
+
+    <group if="$(arg if_record_mobile_stream)">
+    <node pkg="migrave_video_recorder" type="migrave_mobile_stream_recorder.py" name="migrave_mobile_stream_recorder" output="screen">
+        <param name="output_directory" type="str" value="/home/$(arg user)/experiments/$(arg participant)/video/" />
+        <param name="stream_url" type="str" value="http://192.168.50.49:8080/stream.mjpeg" />
+        <param name="is_record_topic" type="str" value="$(arg is_record_topic)" />
+        <param name="video_type" type="str" value="mp4" />
+        <param name="frames_per_second" type="int" value="20" />
+    </node>
+    </group>
+
+    <group if="$(arg if_rosbag)">
+    <node pkg="rosbag" type="record" name="rosbag_recorder"
+       args="record -o /home/$(arg user)/experiments/$(arg participant)/rosbag/rosbag 
+       /qt_nuitrack_app/hands 
+       /qt_nuitrack_app/skeletons 
+       /qt_robot/joints/state
+       /migrave_perception/openface_ros/faces" />
+    </group>
+</launch>
