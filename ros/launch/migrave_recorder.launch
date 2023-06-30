@@ -1,7 +1,25 @@
 <?xml version="1.0"?>
 <launch>
-    <include file="$(find migrave_audio_recorder)/ros/launch/migrave_audio_recorder.launch" />
-    <include file="$(find migrave_video_recorder)/ros/launch/migrave_video_recorder.launch" />
-    <include file="$(find migrave_game_performance_recorder)/ros/launch/migrave_game_performance_recorder.launch" />
-    <include file="$(find migrave_skeleton_recorder)/ros/launch/migrave_skeleton_recorder.launch" />
+    <arg name="is_record_topic" default="/migrave_data_recording/is_record"/>
+    <arg name="output_directory" default="/home/qtrobot/Documents/migrave/qtrobot"/>
+
+    <include file="$(find migrave_audio_recorder)/ros/launch/migrave_audio_recorder.launch">
+        <arg name="is_record_topic" value="$(arg is_record_topic)" />
+        <arg name="output_directory" value="$(arg output_directory)" />
+    </include>
+
+    <include file="$(find migrave_video_recorder)/ros/launch/migrave_video_recorder.launch">
+        <arg name="is_record_topic" value="$(arg is_record_topic)" />
+        <arg name="output_directory" value="$(arg output_directory)" />
+    </include>
+
+    <include file="$(find migrave_game_performance_recorder)/ros/launch/migrave_game_performance_recorder.launch">
+        <arg name="is_record_topic" value="$(arg is_record_topic)" />
+        <arg name="output_directory" value="$(arg output_directory)" />
+    </include>
+
+    <include file="$(find migrave_skeleton_recorder)/ros/launch/migrave_skeleton_recorder.launch">
+        <arg name="is_record_topic" value="$(arg is_record_topic)" />
+        <arg name="output_directory" value="$(arg output_directory)" />
+    </include>
 </launch>
